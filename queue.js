@@ -7,7 +7,7 @@ function Queue() {
   }
 
   Queue.prototype.dequeue = function (element) {
-    this.items.shift(element)
+    return this.items.shift(element)
   }
   
   Queue.prototype.front = function () {
