@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./dictionary.js"></script>
+  <script src="./queue.js"></script>
+</head>
+<body>
+  <script>
+    function Graph() {
+      //属性
+      this.vertexes = []
+      //邻接表
+      this.edges = new Dictionary()
+
+      //方法
+      //添加顶点
+      Graph.prototype.addVertex = function (v) {
+        this.vertexes.push(v);
+        this.edges.set(v, [])
+      }
+
+      //添加边
+      Graph.prototype.addEdge = function (v1, v2) {
+        this.edges.get(v1).push(v2)
+        this.edges.get(v2).push(v1)
+      }
+
+      //toString
+      Graph.prototype.toString = function () {
+        var resultString = ''
+        for (var i = 0; i < this.vertexes.length; i++) {
+          resultString += this.vertexes[i] + ' -> '
+          var vEdges = this.edges.get(this.vertexes[i])
+          for (var j = 0; j < vEdges.length; j++) {
+            resultString += vEdges[j] + ' '
+          }
+          resultString += '\n'
+        }
+        return resultString
+      }
+
+      Graph.prototype.initializeColor = function () {
+        var colors = []
+        for (var i = 0; i < this.vertexes.length; i++) {
+          colors[this.vertexes[i]] = 'white'
+        }
+        return colors
+      }
+
+      //广度优先搜索
+      Graph.prototype.bfs = function(initV, handler){
+
+        //初始化颜色
+        //白色代表未访问，灰色代表已搜索，黑色代表已搜索已访问
+        var colors = this.initializeColor()
+
+        //创建队列
+        var queue = new Queue()
+
+        //将第一个顶点入队
+        queue.enqueue(initV)
+
+        //循环从队列取出元素
+        while(!queue.isEmpty()){
+          //从队列取出一个顶点
+          var v = queue.dequeue()
+          //获取和顶点相连的其他顶点
+          var vList = this.edges.get(v)
+          colors[v] = 'gray'
+          //遍历顶点，设置为灰色并加入队列
+          for(var i=0;i<vList.length;i++){
+            var e = vList[i]
+            if(colors[e] == 'white'){
+              colors[e] = 'gray'
+              queue.enqueue(e)
+            }
+          }
+          //访问顶点
+          handler(v)
+          //将顶点颜色设置为黑色
+          colors[v] = "black"
+        }
+      }
+
+      //深度优先搜索
+      Graph.prototype.dfs = function(initV, handler){
+        var colors = this.initializeColor()
+        this.dfsVisit(initV, colors, handler)
+      }
+      Graph.prototype.dfsVisit = function(v, colors, handler){
+        colors[v] = 'gray'
+        handler(v)
+        var vList = this.edges.get(v)
+        for (var i = 0; i < vList.length; i++) {
+          var e = vList[i]
+          if (colors[e] == 'white') {
+            this.dfsVisit(e, colors, handler)
+          }
+        }
+        colors[v] = 'black'
+      }
+    }
+
+    var g = new Graph()
+    var myVertexes = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+    for (var v of myVertexes) {
+      g.addVertex(v)
+    }
+    g.addEdge('A', 'B')
+    g.addEdge('A', 'C')
+    g.addEdge('A', 'D')
+    g.addEdge('C', 'D')
+    g.addEdge('C', 'G')
+    g.addEdge('D', 'G')
+    g.addEdge('D', 'H')
+    g.addEdge('B', 'E')
+    g.addEdge('B', 'F')
+    g.addEdge('E', 'I')
+
+    alert(g.toString())
+
+    //测试bfs
+    var resultString = ''
+    g.bfs(g.vertexes[0], function(v){
+      resultString += v+ ' '
+    })
+    alert(resultString)
+    
+    //测试dfs
+    var resultString2 = ''
+    g.dfs(g.vertexes[0], function(v){
+      resultString2 += v + ' '
+    })
+    alert(resultString2)
+  </script>
+</body>
+</html>
